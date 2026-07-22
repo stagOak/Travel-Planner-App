@@ -130,3 +130,39 @@ def create_todoist_project(headers: dict, destination: str) -> str:
         return ""
 
     return str(proj_res.json()["id"])
+
+
+def prompt_user():
+
+    # prompt the user with an explicit formatting instruction
+    print("Tip: Add the state code for specific cities (e.g., 'Portland, ME' or 'Portland, OR')")
+    user_input_1 = input("\nWhere are you traveling to tomorrow? ").strip()
+
+    todo_list_format = input("\nDo you want the todo list as a Markup File (MF) of Apple "
+                             "Reminder (AR)? ").strip().upper()
+    if todo_list_format not in ["MF", "AR"]:
+        raise ValueError(f"\n{todo_list_format} is not a valid choice.")
+
+    if not user_input_1:
+        print("Destination cannot be empty. Exiting.")
+        exit()
+
+    # Smart Split: Check if the user used a comma to specify a state
+    if "," in user_input_1:
+        parts = user_input_1.split(",")
+        city = parts[0].strip().title()
+        state = parts[1].strip().upper()
+        # Combine them nicely for display text (e.g., "Portland, ME")
+        user_destination = f"{city}, {state}"
+    else:
+        # Fallback if no comma is provided
+        user_destination = user_input_1.title()
+
+    return {
+        "user_destination": user_destination,
+        "todo_list_format": todo_list_format
+    }
+
+
+if __name__ == "__main__":
+    pass
