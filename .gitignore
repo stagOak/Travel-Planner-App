@@ -1,0 +1,93 @@
+# Environments
+.venv/
+env/
+venv/
+.env
+.venv
+ENV/
+env.bak/
+venv.bak/
+
+# ML specific
+data/raw/
+data/processed/
+*.pt
+*.pth
+*.pkl
+outputs/
+
+# Ignore all large data files but track the folders
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+
+# Ignore training artifacts and large model binaries
+models/checkpoints/*
+models/registry/*
+!models/**/.gitkeep
+
+# Ignore experiment tracking logs
+logs/*
+!logs/**/.gitkeep
+
+# Ignore temporary notebook checkpoints
+.ipynb_checkpoints/
+
+### PyCharm / JetBrains IDEs ###
+# User-specific files (never commit these)
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+.idea/dictionaries/
+
+# Optional: Ignore the entire .idea folder if you work in a team with mixed editors
+# .idea/
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
