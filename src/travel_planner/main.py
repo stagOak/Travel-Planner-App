@@ -140,8 +140,8 @@ if __name__ == "__main__":
     print("Tip: Add the state code for specific cities (e.g., 'Portland, ME' or 'Portland, OR')")
     user_input_1 = input("\nWhere are you flying to tomorrow? ").strip()
 
-    user_input_2 = input("\nDo you want the todo list as a Markup File (MF) of Apple Reminder (AR)? ").strip().title()
-    if user_input_2 not in ["MD", "AR"]:
+    user_input_2 = input("\nDo you want the todo list as a Markup File (MF) of Apple Reminder (AR)? ").strip().upper()
+    if user_input_2 not in ["MF", "AR"]:
         raise ValueError(f"\n{user_input_2} is not a valid choice.")
 
     if not user_input_1:
