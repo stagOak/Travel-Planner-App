@@ -5,6 +5,7 @@ from typing import cast
 from openai.types.chat import ChatCompletion
 import subprocess
 from dotenv import load_dotenv
+from pathlib import Path
 
 # load keys from the local .env file
 load_dotenv()
@@ -23,27 +24,28 @@ Example: Light jacket, Sunglasses, Toothbrush, Phone charger
 
 
 def get_destination_weather(destination: str) -> str:
+
     formatted_city = destination.replace(" ", "+")
     weather_url = f"https://wttr.in/{formatted_city}?format=j1"
 
     try:
         response = requests.get(weather_url)
-        response.raise_for_status()
-        data = response.json()
+        response.raise_for_status()  # stop application and throw exception for unsuccessful status code
+        data = response.json()  # convert from JSON to python dictionary or list
 
         # Access the first index block of the weather forecast data
         tomorrow = data['weather'][0]
 
-        # FIX: Break up the keys into string variables so spellcheck ignores them
+        # break up the keys into string variables so spellcheck ignores them
         max_key = "max" + "temp" + "F"
         min_key = "min" + "temp" + "F"
-
         max_f = tomorrow[max_key]
         min_f = tomorrow[min_key]
 
         # Safely extract and format hourly weather description text
         raw_desc = tomorrow['hourly'][4]['weatherDesc'][0]['value']
-        desc = raw_desc.replace("cloudy", " cloudy").replace("sunny", " sunny").strip()
+        # desc = raw_desc.replace("cloudy", " cloudy").replace("sunny", " sunny").strip()
+        desc = raw_desc.strip()
 
         return f"Forecast for {destination}: {desc}, High: {max_f}°F, Low: {min_f}°F."
 
@@ -89,14 +91,16 @@ def push_to_apple_reminders(destination: str, items: list[str]) -> None:
 
 
 def export_to_text_file(destination: str, items: list[str]) -> None:
-    """Generates a free local checklist file in your project folder."""
-    filename = f"{destination.lower().replace(' ', '_')}_packing_list.md"
+    """Generates a local checklist file in your project folder."""
 
-    with open(filename, "w", encoding="utf-8") as file:
+    filename = f"{destination.lower().replace(' ', '_').replace(',', "")}_packing_list.md"
+
+    script_dir = Path(__file__).resolve()
+    save_path = script_dir.parents[2] / "data" / "processed" / filename  # jump up two levels then data/processed
+    with open(save_path, "w", encoding="utf-8") as file:
         file.write(f"# 🧳 Packing Checklist: Trip to {destination}\n")
         file.write("Generated automatically based on the latest weather forecast.\n\n")
         file.write("## Tasks & Gear:\n")
-
         for item in items:
             file.write(f"- [ ] Pack {item}\n")
 
