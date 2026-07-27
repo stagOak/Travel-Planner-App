@@ -15,7 +15,7 @@ load_dotenv()
 OPENAI_CLIENT = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 
-# Place this at the top of main.py with your configurations
+# text for LLM prompt - used in generate_packing_list() function
 PACKING_PROMPT_TEMPLATE = """
 Based on this weather forecast: "{weather_forecast}", generate a specific packing list for a 2-day trip to 
 {destination}. Include standard travel essentials (charger, ID) and weather-specific clothing.
@@ -24,11 +24,28 @@ Example: Light jacket, Sunglasses, Toothbrush, Phone charger
 """
 
 
+def report_out_results(destination: str, weather_url: str, data: dict) -> None:
+
+    # extract the nearest area data from the payload
+    area_name = data['nearest_area'][0]['areaName'][0]['value']
+    region = data['nearest_area'][0]['region'][0]['value']
+    country = data['nearest_area'][0]['country'][0]['value']
+    lat = data['nearest_area'][0]['latitude']
+    lon = data['nearest_area'][0]['longitude']
+
+    # print out destination data
+    print(f"\nyou entered a request for a weather forcast that was interpreted by this code as {destination}."
+          f"\nthis is the request url that the code generated {weather_url}"
+          f"\nthe request response returned a nearest area of {area_name} in the region {region} in the country of "
+          f"{country}."
+          f"\nlatitude {lat} and longitude {lon}.")
+
+
 def get_destination_weather(destination: str) -> str:
 
     print(f"\nstep 1: fetching weather forecast for {destination}...")
 
-    formatted_city = destination.replace(" ", "+").replace(",", " ")
+    formatted_city = destination.replace(" ", "+").replace(",", "")
     weather_url = f"https://wttr.in/{formatted_city}?format=j1"
 
     try:
@@ -36,7 +53,7 @@ def get_destination_weather(destination: str) -> str:
         response.raise_for_status()  # stop application and throw exception for unsuccessful status code
         data = response.json()  # convert from JSON to python dictionary or list
 
-        # report_out_results(data)
+        report_out_results(destination, weather_url, data)
 
         # access the first index block of the weather forecast data
         tomorrow = data['weather'][0]
@@ -141,7 +158,7 @@ def prompt_user():
 
     print(f"\nprompt user for travel destination and to do list format")
 
-    # prompt the user with an explicit formatting instruction
+    # prompt the user for a travel destination with an explicit formatting instruction
     print("\ntip: add the state code for specific cities (e.g., 'Portland, ME' or 'Portland, OR')")
     destination = input("\nwhere are you traveling to tomorrow? ").strip()
 
@@ -153,15 +170,15 @@ def prompt_user():
     if not destination:
         sys.exit("destination cannot be empty. exiting.")
 
-    # Smart Split: Check if the user used a comma to specify a state
+    # smart split: check if the user used a comma to specify a state
     if "," in destination:
         parts = destination.split(",")
         city = parts[0].strip().title()
         state = parts[1].strip().upper()
-        # Combine them nicely for display text (e.g., "Portland, ME")
+        # combine them nicely for display text (e.g., "Portland, ME")
         user_destination = f"{city}, {state}"
     else:
-        # Fallback if no comma is provided
+        # fallback if no comma is provided
         user_destination = destination.title()
 
     return {
