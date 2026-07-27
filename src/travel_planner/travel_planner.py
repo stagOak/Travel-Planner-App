@@ -26,7 +26,9 @@ Example: Light jacket, Sunglasses, Toothbrush, Phone charger
 
 def get_destination_weather(destination: str) -> str:
 
-    formatted_city = destination.replace(" ", "+")
+    print(f"\nstep 1: fetching weather forecast for {destination}...")
+
+    formatted_city = destination.replace(" ", "+").replace(",", " ")
     weather_url = f"https://wttr.in/{formatted_city}?format=j1"
 
     try:
@@ -49,13 +51,15 @@ def get_destination_weather(destination: str) -> str:
         raw_desc = tomorrow['hourly'][4]['weatherDesc'][0]['value']
         desc = raw_desc.strip()
 
-        return f"Forecast for {destination}: {desc}, High: {max_f}°F, Low: {min_f}°F."
+        return f"forecast for {destination}: {desc}, high: {max_f}°F, low: {min_f}°F."
     except Exception as e:
-        sys.exit(f"Could not fetch real-time weather details ({e}).")
+        sys.exit(f"could not fetch real-time weather details ({e}).")
 
 
 def generate_packing_list(destination: str, weather_forecast: str) -> list[str]:
-    """Uses the ask_gpt helper to parse the packing list cleanly."""
+    """uses the ask_gpt helper to parse the packing list cleanly."""
+
+    print("\nstep 2: generating customized packing list via OpenAI...")
 
     prompt = PACKING_PROMPT_TEMPLATE.format(
         destination=destination,
@@ -69,8 +73,9 @@ def generate_packing_list(destination: str, weather_forecast: str) -> list[str]:
 
 
 def push_to_apple_reminders(destination: str, items: list[str]) -> None:
-    """Creates a free, native list in Apple Reminders and adds tasks."""
-    print(f"Creating a free Apple Reminders list for {destination}...")
+    """creates a free, native list in Apple Reminders and adds tasks."""
+
+    print(f"\nstep 3: creating a free apple reminders list for {destination}...")
 
     # AppleScript commands to create a new list and insert tasks
     applescript = f'''
@@ -88,11 +93,13 @@ def push_to_apple_reminders(destination: str, items: list[str]) -> None:
         subprocess.run(["osascript", "-e", applescript], check=True, capture_output=True)
         print(f"✨ Successfully added {len(items)} tasks to your Apple Reminders app!")
     except Exception as e:
-        print(f"Could not push to Reminders. Is this script running on a Mac? Details: {e}")
+        print(f"could not push to reminders. is this script running on a mac? details: {e}")
 
 
 def export_to_text_file(destination: str, items: list[str]) -> None:
-    """Generates a local checklist file in your project folder."""
+    """generates a local checklist file in your project folder."""
+
+    print(f"\nstep 3: creating a mark down (.md) reminders list for {destination}...")
 
     filename = f"{destination.lower().replace(' ', '_').replace(',', "")}_packing_list.md"
 
@@ -105,11 +112,11 @@ def export_to_text_file(destination: str, items: list[str]) -> None:
         for item in items:
             file.write(f"- [ ] Pack {item}\n")
 
-    print(f"✨ Successfully generated a free local checklist file: '{filename}'!")
+    print(f"\nsuccessfully generated a free local checklist file: '{filename}'!")
 
 
 def ask_gpt(prompt_text: str) -> str:
-    """A single isolated function to handle all OpenAI calls and avoid duplication warnings."""
+    """a single isolated function to handle all OpenAI calls"""
 
     # sends a single-turn prompt to OpenAI's model, waiting for a complete, moderately creative text response all at
     # once. a single-turn prompt is a one-time, standalone input given to an AI model that results in a single response,
@@ -130,47 +137,32 @@ def ask_gpt(prompt_text: str) -> str:
     return content if content is not None else ""
 
 
-def create_todoist_project(headers: dict, destination: str) -> str:
-    """Creates a unique project folder for the destination and returns its ID."""
-    project_data = {"name": f"🧳 Trip to {destination}"}
-    proj_res = requests.post(
-        "https://todoist.com",
-        json=project_data,
-        headers=headers
-    )
-
-    if proj_res.status_code != 200:
-        print(f"Failed to create Todoist project: {proj_res.text}")
-        return ""
-
-    return str(proj_res.json()["id"])
-
-
 def prompt_user():
 
-    # prompt the user with an explicit formatting instruction
-    print("Tip: Add the state code for specific cities (e.g., 'Portland, ME' or 'Portland, OR')")
-    user_input_1 = input("\nWhere are you traveling to tomorrow? ").strip()
+    print(f"\nprompt user for travel destination and to do list format")
 
-    todo_list_format = input("\nDo you want the todo list as a Markup File (MF) of Apple "
-                             "Reminder (AR)? ").strip().upper()
+    # prompt the user with an explicit formatting instruction
+    print("\ntip: add the state code for specific cities (e.g., 'Portland, ME' or 'Portland, OR')")
+    destination = input("\nwhere are you traveling to tomorrow? ").strip()
+
+    todo_list_format = input("\ndo you want the todo list as a markup file (MF/mf) or apple "
+                             "reminder (AR/ar)? ").strip().upper()
     if todo_list_format not in ["MF", "AR"]:
         raise ValueError(f"\n{todo_list_format} is not a valid choice.")
 
-    if not user_input_1:
-        print("Destination cannot be empty. Exiting.")
-        exit()
+    if not destination:
+        sys.exit("destination cannot be empty. exiting.")
 
     # Smart Split: Check if the user used a comma to specify a state
-    if "," in user_input_1:
-        parts = user_input_1.split(",")
+    if "," in destination:
+        parts = destination.split(",")
         city = parts[0].strip().title()
         state = parts[1].strip().upper()
         # Combine them nicely for display text (e.g., "Portland, ME")
         user_destination = f"{city}, {state}"
     else:
         # Fallback if no comma is provided
-        user_destination = user_input_1.title()
+        user_destination = destination.title()
 
     return {
         "user_destination": user_destination,
