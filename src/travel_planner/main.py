@@ -6,7 +6,7 @@ if __name__ == "__main__":
 
     print("\n\n=== weather travel planner ===")
 
-    # get user travel destination
+    # get user travel destination and list format
     return_dict = tp.prompt_user()
     user_destination = return_dict["user_destination"]
     todo_list_format = return_dict["todo_list_format"]
