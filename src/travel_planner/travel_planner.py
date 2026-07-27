@@ -73,6 +73,31 @@ def prompt_user():
     }
 
 
+def unpack_wttr_in_response(destination: str, weather_url: str, data: dict):
+
+    report_out_nearest_area(destination, weather_url, data)
+
+    # access the first index block of the weather forecast data
+    tomorrow = data['weather'][0]
+
+    # break up the keys into string variables so spellcheck ignores them then extract forecast high and low temps
+    max_key = "max" + "temp" + "F"
+    min_key = "min" + "temp" + "F"
+    max_f = tomorrow[max_key]
+    min_f = tomorrow[min_key]
+
+    # extract and format hourly weather description text
+    raw_desc = tomorrow['hourly'][4]['weatherDesc'][0]['value']
+    desc = raw_desc.strip()
+
+    return {
+        "destination": destination,
+        "desc": desc,
+        "max_f": max_f,
+        "min_f": min_f
+    }
+
+
 def get_destination_weather(destination: str) -> str:
 
     print(f"\nstep 1: fetching weather forecast for {destination}...")
@@ -81,26 +106,37 @@ def get_destination_weather(destination: str) -> str:
     weather_url = f"https://wttr.in/{formatted_city}?format=j1"
 
     try:
-        response = requests.get(weather_url)
-        response.raise_for_status()  # stop application and throw exception for unsuccessful status code
-        data = response.json()  # convert from JSON to python dictionary or list
 
-        report_out_nearest_area(destination, weather_url, data)
+        # fire the request with strict connection and read timeouts - (3, 5) means: 3 seconds to establish connection,
+        # 5 seconds to receive data. if wttr.in freezes, it immediately aborts instead of hanging.
+        response = requests.get(weather_url, headers=headers, timeout=(3, 5))
 
-        # access the first index block of the weather forecast data
-        tomorrow = data['weather'][0]
+        # check for HTTP errors(4xx or 5xx codes) - throw exception for unsuccessful status code
+        response.raise_for_status()
 
-        # break up the keys into string variables so spellcheck ignores them then extract forecast high and low temps
-        max_key = "max" + "temp" + "F"
-        min_key = "min" + "temp" + "F"
-        max_f = tomorrow[max_key]
-        min_f = tomorrow[min_key]
+        # convert from JSON to python dictionary or list
+        data = response.json()
 
-        # extract and format hourly weather description text
-        raw_desc = tomorrow['hourly'][4]['weatherDesc'][0]['value']
-        desc = raw_desc.strip()
+        # if we get here the request was completed successfully
+        success = True
+        return_dict = unpack_wttr_in_response(destination, weather_url, data)
+        destination = return_dict["destination"]
+        desc = return_dict["desc"]
+        max_f = return_dict["max_f"]
+        min_f = return_dict["min_f"]
 
         return f"forecast for {destination}: {desc}, high: {max_f}°F, low: {min_f}°F."
+
+    except requests.exceptions.Timeout:
+        print("error: the server took too long to respond (timeout)")
+    except requests.exceptions.HTTPError as http_err:
+        # catches 404, 500, 503 errors triggered by raise_for_status()
+        print(f"http error occurred: {http_err}")
+    except requests.exceptions.ConnectionError:
+        print("network error: the connection was reset, aborted, or refused.")
+    except requests.exceptions.RequestException as e:
+        # catches any other strange network issue that slipped through
+        print(f"an unexpected network error occurred: {e}")
     except Exception as e:
         sys.exit(f"could not fetch real-time weather details ({e}).")
 
