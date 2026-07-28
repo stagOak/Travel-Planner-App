@@ -13,11 +13,11 @@ if __name__ == "__main__":
 
     # get weather forcast for the travel destination
     forecast = tp.get_destination_weather(user_destination)
-    print(f"forecast: {forecast}\n")
+    print(f"\nforecast: {forecast}\n")
 
     # get packing list
     packing_items = tp.generate_packing_list(user_destination, forecast)
-    print(f"items to pack: {packing_items}\n")
+    print(f"\nitems to pack: {packing_items}\n")
 
     # choose your export target
     if todo_list_format == "MF":

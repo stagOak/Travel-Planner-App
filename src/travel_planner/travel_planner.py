@@ -22,22 +22,7 @@ Output ONLY a plain, comma-separated list of items. No markdown, no numbers.
 Example: Light jacket, Sunglasses, Toothbrush, Phone charger
 """
 
-
-def report_out_nearest_area(destination: str, weather_url: str, data: dict) -> None:
-
-    # extract the nearest area data from the payload
-    area_name = data['nearest_area'][0]['areaName'][0]['value']
-    region = data['nearest_area'][0]['region'][0]['value']
-    country = data['nearest_area'][0]['country'][0]['value']
-    lat = data['nearest_area'][0]['latitude']
-    lon = data['nearest_area'][0]['longitude']
-
-    # print out destination data
-    print(f"\nyou entered a request for a weather forcast that was interpreted by this code as {destination}."
-          f"\nthis is the request url that the code generated {weather_url}"
-          f"\nthe request response returned a nearest area of {area_name} in the region {region} in the country of "
-          f"{country}."
-          f"\nlatitude {lat} and longitude {lon}.")
+headers = {'User-Agent': 'Travel-Planner-App: steven.morin@comcast.net'}
 
 
 def prompt_user():
@@ -71,6 +56,23 @@ def prompt_user():
         "user_destination": user_destination,
         "todo_list_format": todo_list_format
     }
+
+
+def report_out_nearest_area(destination: str, weather_url: str, data: dict) -> None:
+
+    # extract the nearest area data from the payload
+    area_name = data['nearest_area'][0]['areaName'][0]['value']
+    region = data['nearest_area'][0]['region'][0]['value']
+    country = data['nearest_area'][0]['country'][0]['value']
+    lat = data['nearest_area'][0]['latitude']
+    lon = data['nearest_area'][0]['longitude']
+
+    # print out destination data
+    print(f"\nyou entered a request for a weather forcast that was interpreted by this code as {destination}."
+          f"\nthis is the request url that the code generated {weather_url}"
+          f"\nthe request response returned a nearest area of {area_name} in the region {region} in the country of "
+          f"{country}."
+          f"\nlatitude {lat} and longitude {lon}.")
 
 
 def unpack_wttr_in_response(destination: str, weather_url: str, data: dict):
@@ -118,7 +120,6 @@ def get_destination_weather(destination: str) -> str:
         data = response.json()
 
         # if we get here the request was completed successfully
-        success = True
         return_dict = unpack_wttr_in_response(destination, weather_url, data)
         destination = return_dict["destination"]
         desc = return_dict["desc"]
@@ -127,18 +128,24 @@ def get_destination_weather(destination: str) -> str:
 
         return f"forecast for {destination}: {desc}, high: {max_f}°F, low: {min_f}°F."
 
-    except requests.exceptions.Timeout:
-        print("error: the server took too long to respond (timeout)")
+    except requests.exceptions.Timeout as timeout_err:
+        # this block catches network-layer timing failures based on our timeout=(3, 5) configuration
+        print(f"\nrequests.exceptions.Timeout - timeout_err: {timeout_err}")
     except requests.exceptions.HTTPError as http_err:
-        # catches 404, 500, 503 errors triggered by raise_for_status()
-        print(f"http error occurred: {http_err}")
-    except requests.exceptions.ConnectionError:
-        print("network error: the connection was reset, aborted, or refused.")
-    except requests.exceptions.RequestException as e:
-        # catches any other strange network issue that slipped through
-        print(f"an unexpected network error occurred: {e}")
+        # this block catches all standard HTTP error statuses triggered by response.raise_for_status()
+        # 4xx Client Errors and 5xx Server Errors
+        print(f"\nhrequests.exceptions.HTTPError - http_err: {http_err}")
+    except requests.exceptions.ConnectionError as connection_err:
+        # this block catches foundational connection infrastructure failures before an HTTP code can even be issued
+        print(f"\nrequests.exceptions.ConnectionError - connection_err: {connection_err}")
+    except requests.exceptions.RequestException as req_exp:
+        # this block is a "catch-all" for the requests library. it catches rare, library-specific errors that did not
+        # fit into the three categories above
+        print(f"\nrequests.exceptions.RequestException - req_exp: {req_exp}")
     except Exception as e:
-        sys.exit(f"could not fetch real-time weather details ({e}).")
+        # this block handles internal Python runtime bugs rather than network/API codes. it catches things that would
+        # completely crash your script
+        sys.exit(f"\ninternal Python runtime bugs - e: {e}")
 
 
 def ask_gpt(prompt_text: str) -> str:
@@ -173,7 +180,7 @@ def generate_packing_list(destination: str, weather_forecast: str) -> list[str]:
         weather_forecast=weather_forecast
     )
 
-    # ask an ai model for a list of things to pack
+    # ask an AI model for a list of things to pack
     raw_list = ask_gpt(prompt).strip()
 
     return [item.strip() for item in raw_list.split(",") if item.strip()]
@@ -198,9 +205,9 @@ def push_to_apple_reminders(destination: str, items: list[str]) -> None:
 
     try:
         subprocess.run(["osascript", "-e", applescript], check=True, capture_output=True)
-        print(f"✨ Successfully added {len(items)} tasks to your Apple Reminders app!")
+        print(f"\nsuccessfully added {len(items)} tasks to your Apple Reminders app!")
     except Exception as e:
-        print(f"could not push to reminders. is this script running on a mac? details: {e}")
+        print(f"\ncould not push to reminders. is this script running on a mac? details: {e}")
 
 
 def export_to_text_file(destination: str, items: list[str]) -> None:
@@ -211,7 +218,7 @@ def export_to_text_file(destination: str, items: list[str]) -> None:
     filename = f"{destination.lower().replace(' ', '_').replace(',', "")}_packing_list.md"
 
     script_dir = Path(__file__).resolve()
-    save_path = script_dir.parents[2] / "data" / "processed" / filename  # jump up two levels then data/processed
+    save_path = script_dir.parents[2] / "src" / "travel_planner" / "data" / "processed" / filename
     with open(save_path, "w", encoding="utf-8") as file:
         file.write(f"# 🧳 Packing Checklist: Trip to {destination}\n")
         file.write("Generated automatically based on the latest weather forecast.\n\n")
@@ -219,7 +226,7 @@ def export_to_text_file(destination: str, items: list[str]) -> None:
         for item in items:
             file.write(f"- [ ] Pack {item}\n")
 
-    print(f"\nsuccessfully generated a free local checklist file: '{filename}'!")
+    print(f"\nsuccessfully generated a free local checklist file: '{filename}'")
 
 
 if __name__ == "__main__":
