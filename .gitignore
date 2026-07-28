@@ -21,6 +21,8 @@ data/raw/*
 data/interim/*
 data/processed/*
 !data/**/.gitkeep
+src/travel_planner/data/processed
+!src/travel_planner/data/processed/.gitkeep
 
 # Ignore training artifacts and large model binaries
 models/checkpoints/*
