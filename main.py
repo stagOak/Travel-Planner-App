@@ -1,6 +1,6 @@
 import src.travel_planner.travel_planner as tp
 import src.travel_planner.destination_weather as dw
-
+import src.travel_planner.destination_prompt as dp
 
 # the execution block that runs when you trigger main.py
 if __name__ == "__main__":
@@ -8,7 +8,7 @@ if __name__ == "__main__":
     print("\n\n=== weather travel planner ===")
 
     # get user travel destination and list format
-    return_dict = tp.prompt_user()
+    return_dict = dp.prompt_user()
     user_destination = return_dict["user_destination"]
     todo_list_format = return_dict["todo_list_format"]
 
