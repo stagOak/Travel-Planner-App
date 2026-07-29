@@ -1,6 +1,7 @@
 import src.travel_planner.travel_planner as tp
 import src.travel_planner.destination_weather as dw
 import src.travel_planner.destination_prompt as dp
+import src.travel_planner.chatgpt_packing_list_builder as cgpt_plb
 
 # the execution block that runs when you trigger main.py
 if __name__ == "__main__":
@@ -17,7 +18,7 @@ if __name__ == "__main__":
     print(f"\nforecast: {forecast}\n")
 
     # get packing list
-    packing_items = tp.generate_packing_list(user_destination, forecast)
+    packing_items = cgpt_plb.generate_packing_list(user_destination, forecast)
     print(f"\nitems to pack: {packing_items}\n")
 
     # choose your export target
