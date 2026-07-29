@@ -1,7 +1,7 @@
 import requests
 import sys
 
-import backup_weather as bw
+import src.travel_planner.backup_weather as bw
 
 headers = {'User-Agent': 'Travel-Planner-App: steven.morin@comcast.net'}
 

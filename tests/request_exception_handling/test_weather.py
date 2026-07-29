@@ -1,71 +1,52 @@
-from unittest.mock import patch, MagicMock
-import pytest
 import requests
+from unittest.mock import patch
 
-from src.travel_planner.travel_planner import get_destination_weather
-
-
-@patch('requests.get')
-def test_weather_timeout(mock_get, capsys):
-    """Tests that a Timeout exception is caught and printed."""
-    mock_get.side_effect = requests.exceptions.Timeout("Connection timed out")
-
-    result = get_destination_weather("New York")
-
-    assert result is None
-    captured = capsys.readouterr()
-    # Updated to match your exact code string
-    assert "requests.exceptions.Timeout - timeout_err:" in captured.out
+from src.travel_planner import backup_weather as bw
+from src.travel_planner.destination_weather import get_destination_weather
 
 
-@patch('requests.get')
-def test_weather_http_error(mock_get, capsys):
-    """Tests that an HTTPError (like a 404 or 500) is caught and printed."""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("500 Server Error")
-    mock_get.return_value = mock_response
+def test_get_destination_weather_timeout(monkeypatch):
+    """Test that requests.exceptions.Timeout triggers the backup weather function."""
+    destination = "New York"
 
-    result = get_destination_weather("London")
+    with patch("requests.get", side_effect=requests.exceptions.Timeout("Connection timed out")):
+        monkeypatch.setattr(bw, "get_backup_weather", lambda dest: f"Backup weather for {dest}")
 
-    assert result is None
-    captured = capsys.readouterr()
-    # Updated to match your exact code string (including the typo 'hrequests')
-    assert "hrequests.exceptions.HTTPError - http_err:" in captured.out
+        result = get_destination_weather(destination)
+        assert result == "Backup weather for New York"
 
 
-@patch('requests.get')
-def test_weather_connection_error(mock_get, capsys):
-    """Tests that a ConnectionError (network down) is caught and printed."""
-    mock_get.side_effect = requests.exceptions.ConnectionError("Connection refused")
+def test_get_destination_weather_http_error(monkeypatch):
+    """Test that requests.exceptions.HTTPError (e.g., 500) triggers backup."""
+    destination = "London"
 
-    result = get_destination_weather("Paris")
+    with patch("requests.get") as mock_get:
+        mock_response = mock_get.return_value
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("500 Server Error")
 
-    assert result is None
-    captured = capsys.readouterr()
-    # Updated to match your exact code string
-    assert "requests.exceptions.ConnectionError - connection_err:" in captured.out
+        monkeypatch.setattr(bw, "get_backup_weather", lambda dest: f"Backup weather for {dest}")
 
-
-@patch('requests.get')
-def test_weather_request_exception(mock_get, capsys):
-    """Tests that any generic requests exception is caught and printed."""
-    mock_get.side_effect = requests.exceptions.RequestException("Unknown requests library error")
-
-    result = get_destination_weather("Berlin")
-
-    assert result is None
-    captured = capsys.readouterr()
-    # Updated to match your exact code string
-    assert "requests.exceptions.RequestException - req_exp:" in captured.out
+        result = get_destination_weather(destination)
+        assert result == "Backup weather for London"
 
 
-@patch('requests.get')
-def test_weather_generic_exception_exits(mock_get):
-    """Tests that any unexpected generic code exception forces a sys.exit."""
-    mock_get.side_effect = Exception("System corruption")
+def test_get_destination_weather_connection_error(monkeypatch):
+    """Test that requests.exceptions.ConnectionError triggers the backup weather function."""
+    destination = "Paris"
 
-    with pytest.raises(SystemExit) as exc_info:
-        get_destination_weather("Tokyo")
+    with patch("requests.get", side_effect=requests.exceptions.ConnectionError("Failed to connect")):
+        monkeypatch.setattr(bw, "get_backup_weather", lambda dest: f"Backup weather for {dest}")
 
-    # Updated to match your exact sys.exit string
-    assert "internal Python runtime bugs - e:" in str(exc_info.value)
+        result = get_destination_weather(destination)
+        assert result == "Backup weather for Paris"
+
+
+def test_get_destination_weather_request_exception(monkeypatch):
+    """Test the final catch-all requests.exceptions.RequestException block."""
+    destination = "Tokyo"
+
+    with patch("requests.get", side_effect=requests.exceptions.RequestException("Generic request error")):
+        monkeypatch.setattr(bw, "get_backup_weather", lambda dest: f"Backup weather for {dest}")
+
+        result = get_destination_weather(destination)
+        assert result == "Backup weather for Tokyo"

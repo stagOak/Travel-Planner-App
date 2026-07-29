@@ -1,5 +1,5 @@
-import travel_planner_app as tp
-import destination_weather as dw
+import src.travel_planner.travel_planner_app as tp
+import src.travel_planner.destination_weather as dw
 
 
 # the execution block that runs when you trigger main.py
