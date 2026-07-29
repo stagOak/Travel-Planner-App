@@ -1,7 +1,7 @@
 import sys
 
 
-def prompt_user():
+def simple_user_destination_prompt():
 
     print(f"\nprompt user for travel destination and to do list format")
 
