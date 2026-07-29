@@ -1,9 +1,9 @@
-import src.travel_planner.travel_planner as tp
 import src.travel_planner.destination_weather as dw
 import src.travel_planner.destination_prompt as dp
-import src.travel_planner.chatgpt_packing_list_query as cgpt_plb
+import src.travel_planner.chatgpt_packing_list_query as cgpt_plq
+import src.travel_planner.packing_list_builder as plb
 
-# the execution block that runs when you trigger main.py
+
 if __name__ == "__main__":
 
     print("\n\n=== weather travel planner ===")
@@ -18,11 +18,11 @@ if __name__ == "__main__":
     print(f"\nforecast: {forecast}\n")
 
     # get packing list
-    packing_items = cgpt_plb.generate_packing_list(user_destination, forecast)
+    packing_items = cgpt_plq.generate_packing_list(user_destination, forecast)
     print(f"\nitems to pack: {packing_items}\n")
 
     # choose your export target
     if todo_list_format == "MF":
-        tp.export_to_text_file(user_destination, packing_items)
+        plb.export_to_text_file(user_destination, packing_items)
     elif todo_list_format == "AR":
-        tp.push_to_apple_reminders(user_destination, packing_items)
+        plb.push_to_apple_reminders(user_destination, packing_items)

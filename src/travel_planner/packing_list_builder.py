@@ -43,7 +43,3 @@ def export_to_text_file(destination: str, items: list[str]) -> None:
             file.write(f"- [ ] Pack {item}\n")
 
     print(f"\nsuccessfully generated a free local checklist file: '{filename}'")
-
-
-if __name__ == "__main__":
-    pass
