@@ -1,4 +1,4 @@
-import src.travel_planner.travel_planner_app as tp
+import src.travel_planner.travel_planner as tp
 import src.travel_planner.destination_weather as dw
 
 

@@ -127,7 +127,7 @@ def export_to_text_file(destination: str, items: list[str]) -> None:
     filename = f"{destination.lower().replace(' ', '_').replace(',', "")}_packing_list.md"
 
     script_dir = Path(__file__).resolve()
-    save_path = script_dir.parents[2] / "src" / "travel_planner" / "data" / "processed" / filename
+    save_path = script_dir.parents[2] / "data" / "processed" / filename
     with open(save_path, "w", encoding="utf-8") as file:
         file.write(f"# 🧳 Packing Checklist: Trip to {destination}\n")
         file.write("Generated automatically based on the latest weather forecast.\n\n")
