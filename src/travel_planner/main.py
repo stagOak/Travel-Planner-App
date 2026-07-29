@@ -1,4 +1,5 @@
-import travel_planner as tp
+import travel_planner_app as tp
+import destination_weather as dw
 
 
 # the execution block that runs when you trigger main.py
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     todo_list_format = return_dict["todo_list_format"]
 
     # get weather forcast for the travel destination
-    forecast = tp.get_destination_weather(user_destination)
+    forecast = dw.get_destination_weather(user_destination)
     print(f"\nforecast: {forecast}\n")
 
     # get packing list
