@@ -69,7 +69,12 @@ def search_osm_destination(query: str, prints: bool = False):
 
 
 if __name__ == "__main__":
-
+    """
+    # prints arg use
+    # python open_street_map_destination_prompt.py casper --prints True
+    # no prints: python open_street_map_destination_prompt.py casper
+    # no prints: python open_street_map_destination_prompt.py casper --prints False
+    
     # OpenStreetMap (osm) geocoder test queries
     # 1. Test a classic non-city natural landmark
     # search_osm_destination("Yellowstone National Park")
@@ -77,6 +82,7 @@ if __name__ == "__main__":
     # search_osm_destination("Seattle")
     # 3. Test a specific point of interest
     # search_osm_destination("Disneyland California")
+    """
 
     # initialize the argument parser
     parser = argparse.ArgumentParser(description="A script that accepts terminal parameters.")
