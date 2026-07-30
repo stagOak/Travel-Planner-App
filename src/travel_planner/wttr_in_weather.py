@@ -1,7 +1,7 @@
 import requests
 import sys
 
-import src.travel_planner.open_metro_weather as bw
+import src.travel_planner.open_meteo_weather as bw
 
 headers = {'User-Agent': 'Travel-Planner-App: steven.morin@comcast.net'}
 

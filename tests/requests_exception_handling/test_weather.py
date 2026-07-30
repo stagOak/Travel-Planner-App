@@ -1,7 +1,7 @@
 import requests
 from unittest.mock import patch
 
-from src.travel_planner import open_metro_weather as bw
+from src.travel_planner import open_meteo_weather as bw
 from src.travel_planner.wttr_in_weather import get_destination_weather
 
 

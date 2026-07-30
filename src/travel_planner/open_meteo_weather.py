@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     # begin processing
     if args.verbose:
-        print("\nopen metro is being queried for coordinates for {}...".format(args.destination))
+        print("\nopen meteo is being queried for coordinates for {}...".format(args.destination))
 
     lat_, lon_, name_, admin1_ = fetch_coordinates(args.destination)
     print(lat_, lon_, name_, admin1_)
