@@ -116,6 +116,7 @@ if __name__ == "__main__":
     """
     This code demonstrates the use of the send_api_request() function when no key is required.
     use without API key: python api_utils.py Seattle https://geocoding-api.open-meteo.com/v1/search
+    when using a key add it to the params
     """
 
     # initialize the argument parser
@@ -131,7 +132,7 @@ if __name__ == "__main__":
 
     # begin processing
     if args.verbose:
-        print("\nopen metro is being queried for coordinates for {}...".format(args.destination))
+        print("\nopen meteo is being queried for coordinates for {}...".format(args.destination))
 
     params_ = {
         "name": args.destination,
