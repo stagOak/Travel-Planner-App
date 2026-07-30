@@ -1,7 +1,7 @@
-import src.travel_planner.destination_weather as dw
-import src.travel_planner.destination_prompt as dp
+import src.travel_planner.wttr_in_weather as dw
+import src.travel_planner.simple_destination_prompt as dp
 import src.travel_planner.chatgpt_packing_list_query as cgpt_plq
-import src.travel_planner.packing_list_builder as plb
+import src.travel_planner.packing_list_document_builder as plb
 
 
 if __name__ == "__main__":

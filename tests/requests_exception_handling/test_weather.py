@@ -1,8 +1,8 @@
 import requests
 from unittest.mock import patch
 
-from src.travel_planner import backup_weather as bw
-from src.travel_planner.destination_weather import get_destination_weather
+from src.travel_planner import open_metro_weather as bw
+from src.travel_planner.wttr_in_weather import get_destination_weather
 
 
 def test_get_destination_weather_timeout(monkeypatch):
