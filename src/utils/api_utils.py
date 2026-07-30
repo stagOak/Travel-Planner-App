@@ -59,6 +59,40 @@ def send_api_request(
     """
     A standalone function to handle HTTP requests with automatic retries,
     exponential backoff, and standardized exception handling.
+
+    Critical Use Case:
+
+        try:
+            response = send_api_request(
+                endpoint=args.endpoint,
+                method="GET",
+                params=params_,
+                timeout=5,
+                max_retries=3,
+                backoff_factor=2.0,
+            )
+            return response  # the calling software can do further processing of response
+        except APIError as e:
+            # critical failure: Log, alert, and shut down gracefully
+            logger.critical(f"CRITICAL FAULT: Application failed to return API response: {e}")
+            sys.exit(1)
+
+       Non-critical Use Case:
+
+        try:
+            response = send_api_request(
+                endpoint=args.endpoint,
+                method="GET",
+                params=params_,
+                timeout=5,
+                max_retries=3,
+                backoff_factor=2.0,
+            )
+            return response  # the calling software can do further processing of response
+        except APIError as e:
+            # fallback behavior instead of crashing
+            return None  # the calling software can figure out what to do in event of an APIError
+
     """
     # Build the full URL smoothly
     if base_url:
