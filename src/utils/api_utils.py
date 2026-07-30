@@ -140,7 +140,7 @@ if __name__ == "__main__":
         "format": "json"
     }
     response_json = send_api_request(
-        endpoint=args.endpoint,  # "https://geocoding-api.open-meteo.com/v1/search",
+        endpoint=args.endpoint,
         method="GET",
         # base_url=None,
         # headers=None,
