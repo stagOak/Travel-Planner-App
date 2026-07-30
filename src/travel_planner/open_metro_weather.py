@@ -1,15 +1,6 @@
 import requests
 import sys
 import argparse
-from pathlib import Path
-
-# evaluates to the absolute path of the 'src' directory
-SRC_DIR = Path(__file__).resolve().parent.parent
-
-# Inject the absolute path string into Python's search path
-sys.path.append(str(SRC_DIR))
-
-from utils import api_utils  # noqa: E402 - tell PyCharm to skip the PEP 8 check here
 
 
 WMO_DESCRIPTIONS = {
@@ -121,14 +112,15 @@ def get_backup_weather(destination: str) -> str:
 
 
 if __name__ == "__main__":
+    """
+    This code demonstrates the cli use of fetch_coordinates to query the Open-Meteo Weather API.
+    """
 
     # initialize the argument parser
     parser = argparse.ArgumentParser()
 
     # add parameters to the argument parser
     parser.add_argument("destination", type=str, help="travel destination")
-
-    # parser.add_argument("prints", nargs='?', type=bool, default=False, help="if True then print out results")
     parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode (Flag)")
 
     # parse the arguments from the terminal
@@ -138,26 +130,5 @@ if __name__ == "__main__":
     if args.verbose:
         print("\nopen metro is being queried for coordinates for {}...".format(args.destination))
 
-    # lat_, lon_, name_, admin1_ = fetch_coordinates(args.destination)
-    # print(lat_, lon_, name_, admin1_)
-
-    params_ = {
-        "name": args.destination,
-        "count": 1,
-        "language": "en",
-        "format": "json"
-    }
-    response_json = api_utils.send_api_request(
-        endpoint="https://geocoding-api.open-meteo.com/v1/search",
-        method="GET",
-        # base_url=None,
-        # headers=None,
-        params=params_,
-        # json_data=None,
-        timeout=5,
-        max_retries=3,
-        backoff_factor=2.0,
-        # ** kwargs
-    )
-
-    print(response_json)
+    lat_, lon_, name_, admin1_ = fetch_coordinates(args.destination)
+    print(lat_, lon_, name_, admin1_)
