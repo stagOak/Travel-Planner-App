@@ -1,5 +1,6 @@
 import requests
 import sys
+import argparse
 
 WMO_DESCRIPTIONS = {
     0: "Clear sky",
@@ -107,3 +108,26 @@ def get_backup_weather(destination: str) -> str:
     tomorrow_desc = WMO_DESCRIPTIONS.get(t_code, f"Unknown condition ({t_code})")
 
     return f"forecast for {destination}: {tomorrow_desc}, high: {t_max}°F, low: {t_min}°F."
+
+
+if __name__ == "__main__":
+
+    # initialize the argument parser
+    parser = argparse.ArgumentParser()
+
+    # add parameters to the argument parser
+    parser.add_argument("destination", type=str, help="travel destination")
+
+    # parser.add_argument("prints", nargs='?', type=bool, default=False, help="if True then print out results")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode (Flag)")
+
+    # parse the arguments from the terminal
+    args = parser.parse_args()
+
+    # begin processing
+    if args.verbose:
+        print("\nopen metro is being queried for coordinates for {}...".format(args.destination))
+
+    lat_, lon_, name_, admin1_ = fetch_coordinates(args.destination)
+
+    print(lat_, lon_, name_, admin1_)
