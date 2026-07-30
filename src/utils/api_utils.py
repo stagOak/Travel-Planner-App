@@ -93,14 +93,19 @@ def send_api_request(
             # fallback behavior instead of crashing
             return None  # the calling software can figure out what to do in event of an APIError
 
+    In the case of a non-critical use case consider putting this code in the except block:
+
+            if not response: # checks if the dictionary is empty {}
+                logger.error("The server responded successfully, but the user profile was blank.")
+                # Take action here based on whether this specific path allows empty data
     """
-    # Build the full URL smoothly
+    # build the full URL
     if base_url:
         url = f"{base_url.rstrip('/')}/{endpoint.lstrip('/')}"
     else:
         url = endpoint
 
-    # Use a session context manager to keep connection pooling efficient
+    # use a session context manager to keep connection pooling efficient
     with requests.Session() as session:
 
         if headers:
@@ -140,7 +145,7 @@ def send_api_request(
                 logger.error(f"Non-retryable request error: {e}")
                 raise APIError(f"An unexpected error occurred: {e}") from e
 
-            # Wait with exponential backoff before the next attempt
+            # wait with exponential backoff before the next attempt
             sleep_time = backoff_factor * (2 ** (attempt - 1))
             logger.info(f"Sleeping for {sleep_time} seconds before next retry...")
             time.sleep(sleep_time)
@@ -151,6 +156,9 @@ if __name__ == "__main__":
     This code demonstrates the use of the send_api_request() function when no key is required.
     use without API key: python api_utils.py Seattle https://geocoding-api.open-meteo.com/v1/search
     when using a key add it to the params
+    
+    cli use example:
+    python api_utils.py Seattle https://geocoding-api.open-meteo.com/v1/search
     """
 
     # initialize the argument parser
