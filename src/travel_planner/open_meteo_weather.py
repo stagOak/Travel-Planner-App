@@ -114,6 +114,9 @@ def get_backup_weather(destination: str) -> str:
 if __name__ == "__main__":
     """
     This code demonstrates the cli use of fetch_coordinates to query the Open-Meteo Weather API.
+    
+    cli use:
+    python open_meteo_weather.py Seattle
     """
 
     # initialize the argument parser
