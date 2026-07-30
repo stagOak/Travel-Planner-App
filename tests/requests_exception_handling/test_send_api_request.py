@@ -1,10 +1,42 @@
 import unittest
 from unittest.mock import patch, MagicMock
-import requests
 from requests.exceptions import Timeout, ConnectionError, HTTPError, RequestException
 
 # Assuming your code is in a file named api_boilerplate.py
 from src.utils.api_utils import send_api_request, APIError
+
+"""
+API Boilerplate Test Suite Evaluation Metrics
+=============================================
+
+This test suite uses pure Python standard libraries (unittest.mock) to evaluate 
+all possible error states, routing strategies, and boundary behaviors of the 
+send_api_request boilerplate function without opening real network sockets.
+
+Tested Scenarios & Core Evaluations:
+
+1. SUCCESS PATHS:
+   - JSON Payload Evaluation: Asserts normal 200 OK success flow with clean 
+     dictionary parsing.
+   - Empty Content Boundary Evaluation: Verifies the code returns a clean {} 
+     when response.content is completely empty, ensuring no JSON parsing crashes.
+
+2. TRANSIENT & NETWORK ANOMALIES (Retry Loop Logic):
+   - Pure Network Layer Failures: Simulates low-level Timeout and ConnectionError 
+     exceptions across all attempts, ensuring the loop counts and drops into an 
+     APIError exactly at the max_retries boundary.
+   - Transient Server Errors (5xx/429): Simulates continuous server-side issues 
+     to confirm they trigger retry attempts up to the loop limit.
+   - Transient Recovery Path: Simulates a failing server on the first attempt 
+     that recovers dynamically to return a 200 OK on a subsequent try.
+
+3. COLD SHORT-CIRCUITS (Waste Prevention):
+   - Permanent Client Failures (4xx except 429): Simulates 404/401 fatal errors. 
+     Evaluates that the function halts execution on Attempt 1, skipping expensive 
+     and useless retry cycles.
+   - Untracked Library Faults: Evaluates generic base-level RequestExceptions 
+     to guarantee a safe crash wrapper without indefinite hangs.
+"""
 
 
 class TestSendAPIRequest(unittest.TestCase):
@@ -118,7 +150,3 @@ class TestSendAPIRequest(unittest.TestCase):
 
         self.assertIn("An unexpected error occurred", str(context.exception))
         self.assertEqual(mock_request.call_count, 1)
-
-
-if __name__ == '__main__':
-    unittest.main()
