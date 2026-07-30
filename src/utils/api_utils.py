@@ -115,6 +115,7 @@ def send_api_request(
 if __name__ == "__main__":
     """
     This code demonstrates the use of the send_api_request() function when no key is required.
+    use without API key: python api_utils.py Seattle https://geocoding-api.open-meteo.com/v1/search
     """
 
     # initialize the argument parser
