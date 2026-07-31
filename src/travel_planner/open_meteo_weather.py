@@ -17,45 +17,6 @@ WMO_DESCRIPTIONS = {
 }
 
 
-def fetch_coordinates(destination: str) -> tuple:
-    """Queries Open-Meteo Geocoding API to return (lat, lon, name, admin1)."""
-
-    geo_url = "https://geocoding-api.open-meteo.com/v1/search"
-    params = {
-        "name": destination,
-        "count": 1,
-        "language": "en",
-        "format": "json"
-    }
-
-    try:
-        res = requests.get(geo_url, params=params, timeout=(3, 5))
-        res.raise_for_status()
-
-        try:
-            data = res.json()
-        except ValueError:
-            sys.exit(f"\n[error] geocoding API returned a non-JSON payload.")
-
-        if not data.get("results"):
-            sys.exit(f"\ncould not resolve location '{destination}' on backup service.")
-
-        lat = data["results"][0]["latitude"]
-        lon = data["results"][0]["longitude"]
-        name = data["results"][0]["name"]
-        admin1 = data["results"][0]["admin1"]
-
-        return lat, lon, name, admin1
-    except requests.exceptions.Timeout as timeout_err:
-        sys.exit(f"\nrequests.exceptions.Timeout - timeout_err: {timeout_err}")
-    except requests.exceptions.HTTPError as http_err:
-        sys.exit(f"\nrequests.exceptions.HTTPError - http_err: {http_err}")
-    except requests.exceptions.ConnectionError as connection_err:
-        sys.exit(f"\nrequests.exceptions.ConnectionError - connection_err: {connection_err}")
-    except requests.exceptions.RequestException as req_err:
-        sys.exit(f"\nrequests.exceptions.RequestException - req_exp: {req_err}")
-
-
 def fetch_tomorrow_forecast(lat: float, lon: float) -> tuple:
     """Queries Open-Meteo Weather API using coordinates to return forecast data tuples."""
 
@@ -93,24 +54,6 @@ def fetch_tomorrow_forecast(lat: float, lon: float) -> tuple:
         sys.exit(f"\nrequests.exceptions.RequestException - req_exp: {req_err}")
 
 
-def get_backup_weather(destination: str) -> str:
-    """Fallback function that orchestrates coordinates and weather data fetching."""
-
-    print(f"\n[backup] primary API failed. attempting fallback for {destination}...")
-
-    # get destination coordinate extraction
-    lat, lon, name, admin1 = fetch_coordinates(destination)
-    print(f"\nbackup service {name}, {admin1} =? {destination}")
-
-    # get destination weather forecat
-    t_max, t_min, t_code = fetch_tomorrow_forecast(lat, lon)
-
-    # decode descriptive code condition string assumes WMO_DESCRIPTIONS dictionary is defined globally
-    tomorrow_desc = WMO_DESCRIPTIONS.get(t_code, f"Unknown condition ({t_code})")
-
-    return f"forecast for {destination}: {tomorrow_desc}, high: {t_max}°F, low: {t_min}°F."
-
-
 def get_open_meteo_destination_weather(destination: str, lat: float, lon: float) -> tuple:
 
     # get destination weather forecat
@@ -120,29 +63,3 @@ def get_open_meteo_destination_weather(destination: str, lat: float, lon: float)
     tomorrow_desc = WMO_DESCRIPTIONS.get(t_code, f"Unknown condition ({t_code})")
 
     return f"forecast for {destination}: {tomorrow_desc}, high: {t_max}°F, low: {t_min}°F."
-
-
-if __name__ == "__main__":
-    """
-    This code demonstrates the cli use of fetch_coordinates to query the Open-Meteo Weather API.
-    
-    cli use:
-    python open_meteo_weather.py Seattle
-    """
-
-    # initialize the argument parser
-    parser = argparse.ArgumentParser()
-
-    # add parameters to the argument parser
-    parser.add_argument("destination", type=str, help="travel destination")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode (Flag)")
-
-    # parse the arguments from the terminal
-    args = parser.parse_args()
-
-    # begin processing
-    if args.verbose:
-        print("\nopen meteo is being queried for coordinates for {}...".format(args.destination))
-
-    lat_, lon_, name_, admin1_ = fetch_coordinates(args.destination)
-    print(lat_, lon_, name_, admin1_)
