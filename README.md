@@ -23,14 +23,14 @@ In step 2 a prompt is programmatically sent to OpenAI ChatGPT requesting the gen
 The response (a packing list) is then sent to a tool that generates either a .md file or an Apple Reminder for the user.
 
 ## System Component Architecture
-<img src="images/system_component_architecture.png" alt="System Component Architecture" width="40%">
-<img src="images/system_component_architecture_legend.png" alt="System Component Architecture Legend" width="40%">
+<img src="images/system_component_architecture.png" alt="System Component Architecture" width="60%">
+<img src="images/system_component_architecture_legend.png" alt="System Component Architecture Legend" width="60%">
 
 ## Screenshot of Execution
-<img src="images/screenshot_of_execution.png" alt="Screenshot of Execution" width="40%">
+<img src="images/screenshot_of_execution.png" alt="Screenshot of Execution" width="60%">
 
 ## Screenshot of .md Packing List
-<img src="images/md_file_packing_list.png" alt="Screenshot of .md Packing List" width="40%">
+<img src="images/md_file_packing_list.png" alt="Screenshot of .md Packing List" width="60%">
 
 ## Screenshot of Apple Reminder Packing List
-<img src="images/apple_reminder_packing_list.png" alt="Screenshot of Apple reminder Packing List" width="40%">
+<img src="images/apple_reminder_packing_list.png" alt="Screenshot of Apple reminder Packing List" width="60%">
