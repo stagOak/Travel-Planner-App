@@ -3,7 +3,7 @@ import sys
 
 def simple_user_destination_prompt():
 
-    print(f"\nprompt user for travel destination and to do list format")
+    print(f"\nstep 1: prompt user for travel destination and to do list format...")
 
     # prompt the user for a travel destination
     print("\ntip: add the state code for specific cities (e.g., 'Portland, ME' or 'Portland, OR')")

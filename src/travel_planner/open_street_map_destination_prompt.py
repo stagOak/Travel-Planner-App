@@ -1,6 +1,5 @@
 from geopy.geocoders import Nominatim
 import sys
-import argparse
 
 import logging
 from typing import List, Dict, Any
@@ -44,14 +43,14 @@ def get_critical_location_options(query: str) -> List[Dict[str, Any]]:
         )
 
         if not response:
-            logger.warning(f"No location matches found for: '{query}'")
+            logger.warning(f"no location matches found for: '{query}'")
             return []
 
         # Ensure the response payload is handled uniformly as a list
         return response if isinstance(response, list) else [response]
 
     except APIError as e:
-        logger.critical(f"CRITICAL FAULT: Application failed to return API response: {e}")
+        logger.critical(f"CRITICAL FAULT: application failed to return API response: {e}")
         sys.exit(1)
 
 
@@ -61,10 +60,10 @@ def present_and_select_location(options: List[Dict[str, Any]]) -> Dict[str, Any]
     and safely prompts them to choose the correct destination match.
     """
     if not options:
-        print("\n[!] No matching locations available to choose from.")
+        print("\n[!] no matching locations available to choose from.")
         return None
 
-    print(f"\nFound {len(options)} matching locations. Please select the best match:")
+    print(f"\nfound {len(options)} matching locations. please select the best match:")
     print("-" * 60)
 
     # 1. Enumerate and display options dynamically
@@ -73,16 +72,16 @@ def present_and_select_location(options: List[Dict[str, Any]]) -> Dict[str, Any]
         lat = choice.get("lat")
         lon = choice.get("lon")
         print(f" [{index}] {display_name}")
-        print(f"     Coordinates: (Lat: {lat}, Lon: {lon})")
+        print(f"     coordinates: (Lat: {lat}, Lon: {lon})")
         print("-" * 60)
 
     # 2. Infinite validation loop for secure numeric input processing
     while True:
         try:
-            user_input = input(f"Enter choice number (1-{len(options)}) or 'q' to cancel: ").strip()
+            user_input = input(f"enter choice number (1-{len(options)}) or 'q' to cancel: ").strip()
 
             if user_input.lower() == 'q':
-                print("[*] Selection canceled by user.")
+                print("[*] selection canceled by user.")
                 return None
 
             selection_index = int(user_input)
@@ -93,7 +92,7 @@ def present_and_select_location(options: List[Dict[str, Any]]) -> Dict[str, Any]
                 print(f"\nSelected: {chosen_location.get('display_name')}")
                 return chosen_location
             else:
-                print(f"[!] Invalid entry. Number must be between 1 and {len(options)}.")
+                print(f"[!] invalid entry. number must be between 1 and {len(options)}.")
 
         except ValueError:
-            print("[! Invalid input. Please enter a valid number or 'q'.")
+            print("[! invalid input. please enter a valid number or 'q'.")

@@ -28,6 +28,8 @@ if __name__ == "__main__":
         forecast = ow.get_open_meteo_destination_weather(user_destination, selected_location['lat'],
                                                          selected_location['lon'])
 
+        print(f"\n{forecast}")
+
         # get packing list
         packing_items = cgpt_plq.generate_packing_list(user_destination, forecast)
         print(f"\nitems to pack: {packing_items}\n")
