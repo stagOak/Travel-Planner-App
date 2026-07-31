@@ -111,6 +111,17 @@ def get_backup_weather(destination: str) -> str:
     return f"forecast for {destination}: {tomorrow_desc}, high: {t_max}°F, low: {t_min}°F."
 
 
+def get_open_meteo_destination_weather(destination: str, lat: float, lon: float) -> tuple:
+
+    # get destination weather forecat
+    t_max, t_min, t_code = fetch_tomorrow_forecast(lat, lon)
+
+    # decode descriptive code condition string assumes WMO_DESCRIPTIONS dictionary is defined globally
+    tomorrow_desc = WMO_DESCRIPTIONS.get(t_code, f"Unknown condition ({t_code})")
+
+    return f"forecast for {destination}: {tomorrow_desc}, high: {t_max}°F, low: {t_min}°F."
+
+
 if __name__ == "__main__":
     """
     This code demonstrates the cli use of fetch_coordinates to query the Open-Meteo Weather API.

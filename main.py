@@ -1,7 +1,8 @@
-import src.travel_planner.wttr_in_weather as dw
 import src.travel_planner.simple_destination_prompt as dp
 import src.travel_planner.chatgpt_packing_list_query as cgpt_plq
 import src.travel_planner.packing_list_document_builder as plb
+import src.travel_planner.open_street_map_destination_prompt as osmdp
+import src.travel_planner.open_meteo_weather as ow
 
 
 if __name__ == "__main__":
@@ -13,16 +14,26 @@ if __name__ == "__main__":
     user_destination = return_dict["user_destination"]
     todo_list_format = return_dict["todo_list_format"]
 
-    # get weather forcast for the travel destination
-    forecast = dw.get_destination_weather(user_destination)
-    print(f"\nforecast: {forecast}\n")
+    # fetch the 5 raw locations that match the input user destination
+    location_options = osmdp.get_critical_location_options(user_destination)
 
-    # get packing list
-    packing_items = cgpt_plq.generate_packing_list(user_destination, forecast)
-    print(f"\nitems to pack: {packing_items}\n")
+    # funnel them into your interface prompt helper and select the one you wanted
+    selected_location = osmdp.present_and_select_location(location_options)
 
-    # choose your export target
-    if todo_list_format == "MF":
-        plb.export_to_text_file(user_destination, packing_items)
-    elif todo_list_format == "AR":
-        plb.push_to_apple_reminders(user_destination, packing_items)
+    if selected_location:
+
+        # Safely proceed with downstream data processing routing (e.g. Weather updates)
+        print(f"Targeting coordinates: {selected_location['lat']}, {selected_location['lon']}")
+
+        forecast = ow.get_open_meteo_destination_weather(user_destination, selected_location['lat'],
+                                                         selected_location['lon'])
+
+        # get packing list
+        packing_items = cgpt_plq.generate_packing_list(user_destination, forecast)
+        print(f"\nitems to pack: {packing_items}\n")
+
+        # choose your export target
+        if todo_list_format == "MF":
+            plb.export_to_text_file(user_destination, packing_items)
+        elif todo_list_format == "AR":
+            plb.push_to_apple_reminders(user_destination, packing_items)
