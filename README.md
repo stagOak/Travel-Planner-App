@@ -37,6 +37,35 @@ The response (a packing list) is then sent to a tool that generates either a .md
 
 # Prerequisites
 
+## Set Up a Virtual Environment
+
+### Step 1: Create the Virtual Environment
+Run the following command in your project root directory:
+
+* **macOS / Linux:**
+  ```bash
+  python -m venv .venv
+  ```
+  or
+* ```bash
+  python3 -m venv .venv
+  ```
+
+### Step 2: Activate the Environment
+
+* **macOS / Linux:**
+  ```bash
+  source .venv/bin/activate
+  ```
+
+*Your terminal prompt will now show `(.venv)`, indicating the environment is active.*
+
+### Step 3: Install Dependencies from `requirements.txt`
+
+```bash
+pip install -r requirements.txt
+```
+
 ## OpenAI API Account Setup
 
 Follow these steps to create an account and fund it to start making API calls.
