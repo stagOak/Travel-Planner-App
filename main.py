@@ -3,11 +3,14 @@ import src.travel_planner.chatgpt_packing_list_query as cgpt_plq
 import src.travel_planner.packing_list_document_builder as plb
 import src.travel_planner.open_street_map_destination_prompt as osmdp
 import src.travel_planner.open_meteo_weather as ow
+import src.utils.config_and_api_key_validation as cv
 
 
 if __name__ == "__main__":
 
-    print("\n\n=== weather travel planner ===")
+    api_key = cv.validate_environment()
+
+    print("\n=== weather travel planner ===")
 
     # get user travel destination and list format
     return_dict = dp.simple_user_destination_prompt()

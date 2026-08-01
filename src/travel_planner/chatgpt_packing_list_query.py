@@ -1,17 +1,9 @@
-import os
 from openai import OpenAI
 from typing import cast
 from openai.types.chat import ChatCompletion
-# import subprocess
-from dotenv import load_dotenv
-# from pathlib import Path
 
+import src.utils.yaml_utils as yaml_utils
 
-# load keys from the local .env file
-load_dotenv()
-
-# initialize API clients
-OPENAI_CLIENT = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # text for LLM prompt - used in generate_packing_list() function
 PACKING_PROMPT_TEMPLATE = """
@@ -25,10 +17,13 @@ Example: Light jacket, Sunglasses, Toothbrush, Phone charger
 def ask_gpt(prompt_text: str) -> str:
     """a single isolated function to handle all OpenAI calls"""
 
+    api_key = yaml_utils.get_secret_key()
+    openai_client = OpenAI(api_key=api_key)
+
     # sends a single-turn prompt to OpenAI's model, waiting for a complete, moderately creative text response all at
     # once. a single-turn prompt is a one-time, standalone input given to an AI model that results in a single response,
     # with no ongoing conversation or memory of past chats
-    raw_response = OPENAI_CLIENT.chat.completions.create(
+    raw_response = openai_client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt_text}],
         temperature=0.5,
