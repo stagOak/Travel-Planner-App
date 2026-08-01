@@ -111,7 +111,7 @@ def send_api_request(
         if headers:
             session.headers.update(headers)
 
-        for attempt in range(1, max_retries + 1):
+        for attempt in range(1, max_retries + 1):  # noqa
             try:
                 response = session.request(
                     method=method,
