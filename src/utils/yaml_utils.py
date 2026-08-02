@@ -30,5 +30,5 @@ def get_secret_key():
 
 
 if __name__ == "__main__":
-    api_key = get_secret_key()
-    print(api_key)
+    api_key_ = get_secret_key()
+    print(api_key_)
